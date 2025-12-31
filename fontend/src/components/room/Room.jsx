@@ -30,7 +30,21 @@ const Room = () => {
 		return <div>Loading rooms.....</div>
 	}
 	if (error) {
-		return <div className=" text-danger">Error : {error}</div>
+		return (
+			<div className="alert alert-danger" style={{ whiteSpace: 'pre-line' }}>
+				<h5>❌ Lỗi kết nối Backend</h5>
+				<p>{error}</p>
+				<hr />
+				<p><strong>Hướng dẫn khởi động Backend:</strong></p>
+				<ol>
+					<li>Mở terminal mới</li>
+					<li>Chạy lệnh: <code>cd /Users/mac/Desktop/hotelbooking/Hotel-Web && ./START_BACKEND.sh</code></li>
+					<li>Hoặc: <code>cd /Users/mac/Desktop/hotelbooking/Hotel-Web/backend && ./mvnw spring-boot:run</code></li>
+					<li>Đợi backend khởi động xong (thấy "Started BackendApplication")</li>
+					<li>Refresh trang này</li>
+				</ol>
+			</div>
+		)
 	}
 
     const handlePageChange = (pageNumber) => {

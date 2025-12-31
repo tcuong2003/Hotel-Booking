@@ -14,7 +14,14 @@ const RoomCard = ({room}) => {
                       variant="top"
                       src={getRoomImageSrc(room)}
                       alt={`${room.roomType} Photo`}
-                      style={{ width: "100%", maxWidth: "200px", height: "auto", objectFit: "cover" }}/>
+                      style={{ width: "100%", maxWidth: "200px", height: "200px", objectFit: "cover" }}
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        const fallbackImg = getRoomImageSrc({ roomType: room.roomType });
+                        if (e.target.src !== fallbackImg) {
+                          e.target.src = fallbackImg;
+                        }
+                      }}/>
                   </Link>
                 </div>
 

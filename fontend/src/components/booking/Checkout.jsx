@@ -56,6 +56,13 @@ const Checkout = () => {
 									src={getRoomImageSrc(roomInfo)}
 									alt={`${roomInfo.roomType} photo`}
 									style={{ width: "100%", height: "200px", objectFit: "cover" }}
+									onError={(e) => {
+										// Fallback if image fails to load
+										const fallbackImg = getRoomImageSrc({ roomType: roomInfo.roomType });
+										if (e.target.src !== fallbackImg) {
+											e.target.src = fallbackImg;
+										}
+									}}
 								/>
 								<table className="table table-bordered">
 									<tbody>

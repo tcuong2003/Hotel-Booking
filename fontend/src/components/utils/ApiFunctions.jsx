@@ -42,7 +42,17 @@ export async function getAllRooms() {
         const result = await api.get("/rooms/all-rooms")
         return result.data
     } catch (error) {
-        throw new Error("Error fetching rooms")
+        console.error("Error fetching rooms:", error)
+        if (error.response) {
+            // Server responded with error status
+            throw new Error(`Error fetching rooms: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`)
+        } else if (error.request) {
+            // Request made but no response received
+            throw new Error("Backend chưa chạy! Vui lòng khởi động backend trước:\n\n1. Mở terminal và chạy:\n   cd Hotel-Web\n   ./START_BACKEND.sh\n\n2. Hoặc:\n   cd Hotel-Web/backend\n   ./mvnw spring-boot:run\n\n3. Đợi backend khởi động xong (thấy 'Started BackendApplication')\n4. Refresh trang này")
+        } else {
+            // Error setting up request
+            throw new Error(`Error fetching rooms: ${error.message}`)
+        }
     }
 }
 
@@ -166,8 +176,18 @@ export async function loginUser(login) {
 			return null
 		}
 	} catch (error) {
-		console.error(error)
-		return null
+		console.error("Login error:", error)
+		if (error.response) {
+			// Server responded with error status
+			const errorMessage = error.response.data?.message || error.response.data || `Login failed: ${error.response.status}`
+			throw new Error(errorMessage)
+		} else if (error.request) {
+			// Request made but no response received
+			throw new Error("No response from server. Please check if the backend is running.")
+		} else {
+			// Error setting up request
+			throw new Error(`Login error: ${error.message}`)
+		}
 	}
 }
 

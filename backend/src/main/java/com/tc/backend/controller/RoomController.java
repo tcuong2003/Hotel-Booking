@@ -1,7 +1,6 @@
 package com.tc.backend.controller;
 
 import com.tc.backend.exception.InternalServerException;
-import com.tc.backend.exception.PhotoRetrievalException;
 import com.tc.backend.exception.ResourceNotFoundException;
 import com.tc.backend.model.BookedRoom;
 import com.tc.backend.model.Room;
@@ -50,23 +49,33 @@ public class RoomController {
     }
 
     @GetMapping("/all-rooms")
-    public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
-        List<Room> rooms = iRoomService.getAllRooms();
-        List<RoomResponse> roomResponses = new ArrayList<>();
-        for (Room room : rooms) {
-            RoomResponse roomResponse = getRoomResponse(room);
-            try {
-                byte[] photoBytes = iRoomService.getRoomPhotoByRoomId(room.getId());
-                if (photoBytes != null && photoBytes.length > 0) {
-                    String base64Photo = Base64.encodeBase64String(photoBytes);
-                    roomResponse.setPhoto(base64Photo);
+    public ResponseEntity<List<RoomResponse>> getAllRooms() {
+        try {
+            List<Room> rooms = iRoomService.getAllRooms();
+            List<RoomResponse> roomResponses = new ArrayList<>();
+            for (Room room : rooms) {
+                RoomResponse roomResponse = getRoomResponse(room);
+                // Try to get photo if not already set in getRoomResponse
+                if (roomResponse.getPhoto() == null || roomResponse.getPhoto().isEmpty()) {
+                    try {
+                        byte[] photoBytes = iRoomService.getRoomPhotoByRoomId(room.getId());
+                        if (photoBytes != null && photoBytes.length > 0) {
+                            String base64Photo = Base64.encodeBase64String(photoBytes);
+                            roomResponse.setPhoto(base64Photo);
+                        }
+                    } catch (Exception e) {
+                        // If photo retrieval fails, continue without photo - room will use fallback image
+                        System.out.println("Photo not available for room ID: " + room.getId());
+                    }
                 }
-            } catch (Exception e) {
-                // If photo retrieval fails, continue without photo
+                roomResponses.add(roomResponse);
             }
-            roomResponses.add(roomResponse);
+            return ResponseEntity.ok(roomResponses);
+        } catch (Exception e) {
+            System.err.println("Error in getAllRooms: " + e.getMessage());
+            e.printStackTrace();
+            throw new InternalServerException("Error fetching rooms: " + e.getMessage());
         }
-        return ResponseEntity.ok(roomResponses);
     }
 
     @DeleteMapping("/delete/room/{id}")
@@ -145,7 +154,8 @@ public class RoomController {
                 photoBytes = photoBlob.getBytes(1, (int) photoBlob.length());
             }
             catch (SQLException ex) {
-                throw new PhotoRetrievalException("Error retrieving photo");
+                // If photo retrieval fails, continue without photo - don't throw exception
+                System.out.println("Error retrieving photo for room ID: " + room.getId() + " - " + ex.getMessage());
             }
         }
         return new RoomResponse(room.getId(),

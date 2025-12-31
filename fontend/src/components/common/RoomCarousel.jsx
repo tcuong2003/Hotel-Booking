@@ -26,7 +26,21 @@ const RoomCarousel = () => {
 		return <div className="mt-5">Loading rooms....</div>
 	}
 	if (errorMessage) {
-		return <div className=" text-danger mb-5 mt-5">Error : {errorMessage}</div>
+		return (
+			<div className="alert alert-danger mb-5 mt-5" style={{ whiteSpace: 'pre-line' }}>
+				<h5>❌ Lỗi kết nối Backend</h5>
+				<p>{errorMessage}</p>
+				<hr />
+				<p><strong>Hướng dẫn khởi động Backend:</strong></p>
+				<ol>
+					<li>Mở terminal mới</li>
+					<li>Chạy lệnh: <code>cd /Users/mac/Desktop/hotelbooking/Hotel-Web && ./START_BACKEND.sh</code></li>
+					<li>Hoặc: <code>cd /Users/mac/Desktop/hotelbooking/Hotel-Web/backend && ./mvnw spring-boot:run</code></li>
+					<li>Đợi backend khởi động xong (thấy "Started BackendApplication")</li>
+					<li>Refresh trang này</li>
+				</ol>
+			</div>
+		)
 	}
 
 	return (
@@ -50,6 +64,13 @@ const RoomCarousel = () => {
 													alt={`${room.roomType} Photo`}
 													className="w-100"
 													style={{ height: "200px", objectFit: "cover" }}
+													onError={(e) => {
+														// Fallback if image fails to load
+														const fallbackImg = getRoomImageSrc({ roomType: room.roomType });
+														if (e.target.src !== fallbackImg) {
+															e.target.src = fallbackImg;
+														}
+													}}
 												/>
 											</Link>
 											<Card.Body>
