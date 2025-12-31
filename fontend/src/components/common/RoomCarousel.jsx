@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { getAllRooms } from "../utils/ApiFunctions"
 import { Link } from "react-router-dom"
 import { Card, Carousel, Col, Container, Row } from "react-bootstrap"
+import { getRoomImageSrc } from "../../utils/roomImageMapper"
 
 const RoomCarousel = () => {
 	const [rooms, setRooms] = useState([{ id: "", roomType: "", roomPrice: "", photo: "" }])
@@ -45,10 +46,10 @@ const RoomCarousel = () => {
 											<Link to={`/book-room/${room.id}`}>
 												<Card.Img
 													variant="top"
-													src={`data:image/png;base64, ${room.photo}`}
-													alt="Room Photo"
+													src={getRoomImageSrc(room)}
+													alt={`${room.roomType} Photo`}
 													className="w-100"
-													style={{ height: "200px" }}
+													style={{ height: "200px", objectFit: "cover" }}
 												/>
 											</Link>
 											<Card.Body>

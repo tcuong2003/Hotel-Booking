@@ -54,13 +54,17 @@ public class RoomController {
         List<Room> rooms = iRoomService.getAllRooms();
         List<RoomResponse> roomResponses = new ArrayList<>();
         for (Room room : rooms) {
-            byte[] photoBytes = iRoomService.getRoomPhotoByRoomId(room.getId());
-            if (photoBytes != null && photoBytes.length > 0) {
-                String base64Photo = Base64.encodeBase64String(photoBytes);
-                RoomResponse roomResponse = getRoomResponse(room);
-                roomResponse.setPhoto(base64Photo);
-                roomResponses.add(roomResponse);
+            RoomResponse roomResponse = getRoomResponse(room);
+            try {
+                byte[] photoBytes = iRoomService.getRoomPhotoByRoomId(room.getId());
+                if (photoBytes != null && photoBytes.length > 0) {
+                    String base64Photo = Base64.encodeBase64String(photoBytes);
+                    roomResponse.setPhoto(base64Photo);
+                }
+            } catch (Exception e) {
+                // If photo retrieval fails, continue without photo
             }
+            roomResponses.add(roomResponse);
         }
         return ResponseEntity.ok(roomResponses);
     }
@@ -84,12 +88,23 @@ public class RoomController {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<Optional<RoomResponse>> getRoomById(@PathVariable Long roomId) {
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) throws SQLException {
         Optional<Room> theRoom = iRoomService.getRoomById(roomId);
-        return theRoom.map(room -> {
-            RoomResponse roomResponse = getRoomResponse(room);
-            return ResponseEntity.ok(Optional.of(roomResponse));
-        }).orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+        if (theRoom.isPresent()) {
+            RoomResponse roomResponse = getRoomResponse(theRoom.get());
+            try {
+                byte[] photoBytes = iRoomService.getRoomPhotoByRoomId(theRoom.get().getId());
+                if (photoBytes != null && photoBytes.length > 0) {
+                    String base64Photo = Base64.encodeBase64String(photoBytes);
+                    roomResponse.setPhoto(base64Photo);
+                }
+            } catch (Exception e) {
+                // If photo retrieval fails, continue without photo
+            }
+            return ResponseEntity.ok(roomResponse);
+        } else {
+            throw new ResourceNotFoundException("Room not found");
+        }
     }
 
     @GetMapping("/available-rooms")

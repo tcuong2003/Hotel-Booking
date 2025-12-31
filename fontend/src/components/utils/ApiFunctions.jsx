@@ -20,7 +20,7 @@ export async function addRoom(photo, roomType, roomPrice) {
     formData.append('roomPrice', roomPrice);
 
     const response = await api.post("/rooms/add/new-room", formData)
-    if (response.status === 201) { //mã trạng thái 201 là đã tạo DB
+    if (response.status >= 200 && response.status < 300) { //mã trạng thái 200-299 là thành công
         return true;
     } else {
         return false;
@@ -128,11 +128,18 @@ export async function cancelBooking(bookingId) {
 
 /* This function gets all availavle rooms from the database with a given date and a room type */
 export async function getAvailableRooms(checkInDate, checkOutDate, roomType) {
-	const result = await api.get(
-		`rooms/available-rooms?checkInDate=${checkInDate}
-		&checkOutDate=${checkOutDate}&roomType=${roomType}`
-	)
-	return result
+	try {
+		const result = await api.get(
+			`/rooms/available-rooms?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&roomType=${roomType}`
+		)
+		return result
+	} catch (error) {
+		if (error.response && error.response.data) {
+			throw new Error(error.response.data)
+		} else {
+			throw new Error(`Error fetching available rooms: ${error.message}`)
+		}
+	}
 }
 
 /* This function register a new user */
@@ -141,7 +148,7 @@ export async function registerUser(registration) {
 		const response = await api.post("/auth/register-user", registration)
 		return response.data
 	} catch (error) {
-		if (error.reeponse && error.response.data) {
+		if (error.response && error.response.data) {
 			throw new Error(error.response.data)
 		} else {
 			throw new Error(`User registration error : ${error.message}`)
@@ -167,7 +174,7 @@ export async function loginUser(login) {
 /*  This is function to get the user profile */
 export async function getUserProfile(userId, token) {
 	try {
-		const response = await api.get(`users/profile/${userId}`, {
+		const response = await api.get(`/users/profile/${userId}`, {
 			headers: getHeader()
 		})
 		return response.data

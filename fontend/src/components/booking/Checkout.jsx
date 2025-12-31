@@ -13,6 +13,7 @@ import {
 import { useParams } from "react-router-dom"
 import { getRoomById } from "../utils/ApiFunctions"
 import RoomCarousel from "../common/RoomCarousel"
+import { getRoomImageSrc } from "../../utils/roomImageMapper"
 
 const Checkout = () => {
 	const [error, setError] = useState(null)
@@ -52,9 +53,9 @@ const Checkout = () => {
 						) : ( 
 							<div className="room-info">
 								<img
-									src={`data:image/png;base64,${roomInfo.photo}`}
-									alt="Room photo"
-									style={{ width: "100%", height: "200px" }}
+									src={getRoomImageSrc(roomInfo)}
+									alt={`${roomInfo.roomType} photo`}
+									style={{ width: "100%", height: "200px", objectFit: "cover" }}
 								/>
 								<table className="table table-bordered">
 									<tbody>

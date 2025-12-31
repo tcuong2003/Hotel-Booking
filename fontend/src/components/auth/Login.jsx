@@ -6,8 +6,8 @@ import { useAuth } from "./AuthProvider.jsx";
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [login, setLogin] = useState({
-    email: "",
-    password: "",
+    email: "test@hotel.com",
+    password: "123456",
   });
 
   const navigate = useNavigate();
