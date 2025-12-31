@@ -1,0 +1,5 @@
+[build]
+builder = "maven"
+
+[deploy]
+startCommand = "java -jar target/*.jar"
