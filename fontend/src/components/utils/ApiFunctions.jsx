@@ -7,6 +7,7 @@ import axios from "axios"; //thư viện js gọi các API của backend kết h
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
+console.log("API Base URL:", import.meta.env.VITE_API_BASE_URL);
 
 export default api;
 
