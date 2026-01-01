@@ -62,16 +62,15 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Dùng allowedOriginPatterns để support wildcard (*.vercel.app)
-        configuration.setAllowedOriginPatterns(List.of(
+        configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",
-                "https://*.vercel.app"
-                // Nếu bạn có custom domain vercel (vd: https://hotelapp.com) thì thêm vào đây
-                // "https://hotelapp.com"
+                "https://*.vercel.app",
+                "https://hotel-booking-chi-six.vercel.app" // domain thật của bạn (nếu muốn cố định)
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -79,7 +78,7 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
